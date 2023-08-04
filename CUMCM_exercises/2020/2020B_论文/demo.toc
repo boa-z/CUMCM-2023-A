@@ -1,0 +1,10 @@
+\contentsline {section}{\numberline {一、}问题重述}{2}{section.1}%
+\contentsline {subsection}{\numberline {1\,.\,1}问题的提出}{2}{subsection.1.1}%
+\contentsline {section}{\numberline {二、}模型的假设}{2}{section.2}%
+\contentsline {section}{\numberline {三、}符号说明}{2}{section.3}%
+\contentsline {section}{\numberline {四、}问题分析}{3}{section.4}%
+\contentsline {subsection}{\numberline {4\,.\,1}问题一分析}{3}{subsection.4.1}%
+\contentsline {section}{\numberline {五、}绘制普通三线表格}{3}{section.5}%
+\contentsline {section}{\numberline {附录A}代码}{4}{appendix.A}%
+\contentsline {subsection}{\numberline {A.1}第一问不挖矿--matlab 源程序}{4}{subsection.A.1}%
+\contentsfinish 

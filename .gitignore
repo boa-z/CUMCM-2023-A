@@ -1,0 +1,29 @@
+*.bak
+*.pyc
+*.xml
+*.tar.gz
+*.iml
+*.icls
+
+# Temp
+build/
+docs/build/
+docs/_build/
+dist/
+*.egg-info/
+colors
+# IDE
+.idea/
+
+.DS_Store
+
+# 排除各种答辩资料
+
+CUMCM历年论文/
+CUMCM历年赛题/
+复旦资料/
+智慧树资料/
+老哥资料/
+论文模版/
+鼠鼠官方群文件/
+鼠鼠资料/
