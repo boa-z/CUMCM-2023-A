@@ -81,7 +81,7 @@ def dp_main():
 
     # 起点购买物资
     for init_food in range(0, 600):
-        init_water = (carry_limit - base_food_weight * init_food) // base_water_weight
+        init_water = (init_money - base_food_price * init_food) // base_water_price
         if check(init_food, init_water):
             dp[0][1][init_food][init_water] = init_money - base_consume_food[get_weather(cur_day)] * init_food - base_consume_water[
                 get_weather(cur_day)] * init_water
@@ -94,7 +94,7 @@ def dp_main():
                 cur_food = init_food - 2 * base_consume_food[get_weather(cur_day)]
                 cur_water = init_water - 2 * base_consume_water[get_weather(cur_day)]
                 dp[cur_day + 1, cur_point_new, cur_food, cur_water] = dp[cur_day, cur_point, cur_food, cur_water]
-                print(dp[0, 1, init_food, init_water])
+                # print(dp[0, 1, init_food, init_water])
                 # print(dp[cur_day + 1, cur_point_new, food - 2 * base_consume_water[get_weather(cur_day)], water - 2 *
                 #          base_consume_food[
                 #              get_weather(cur_day)]])

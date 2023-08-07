@@ -1,208 +1,184 @@
-import numpy as np
-import pandas as pd
-import pulp as pl
-
-p = np.array([
-    [0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0],
-    [0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0],
-    [0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0],
-    [0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0],
-    [0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0],
-    [0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0,
-        1, 1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0,
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 0,
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1,
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1,
-        1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0,
-        1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 1,
-        0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
-        1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0,
-        0, 1, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        0, 1, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0,
-        0, 0, 1, 0, 0, 1, 0, 1, 1, 0, 0, 0, 1],
-    [0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 0, 1, 0],
-    [0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 0],
-    [1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0],
-])
-
-T = 30  # 游戏总天数
-N = len(p)  # 总的区域个数
-M = 999999  # 相对大的数
-G = 1000  # 挖矿的基础收益
-L = 1200  # 负重上限
-S_0 = 10000  # 初始资金
-W_1 = 3  # 水的单位重量
-W_2 = 2  # 食物的单位重量
-P_1 = 5  # 水的单位价格
-P_2 = 10  # 食物的单位价格
-
-# 每天水和食物的基础消耗量（箱）
-A = [5, 8, 10]  # 水
-B = [7, 6, 10]  # 食物
-
-# 天气状况：1表示晴朗、2表示高温、3表示沙暴
-weather = [2, 2, 1, 3, 1, 2, 3, 1, 2, 2, 3, 2, 1, 2,
-           2, 2, 3, 3, 2, 2, 1, 1, 2, 1, 3, 2, 1, 1, 2, 2]
-
-# 区域类型：1表示起点、2表示矿山、3表示村庄、4表示终点
-area_type = [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2,
-             0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4]
-print("地图p的形状为：", p.shape)
-print("总的区域个数为：", N)
-print("游戏总天数为：", T)
-print("初始资金为：", S_0)
+init_water=180
+init_food=330
+money=10000-init_food*10-init_water*5
 
 
-##2##
+weather=["高温","高温","晴朗","沙暴","晴朗",
+         "高温","沙暴","晴朗","高温","高温",
+         "沙暴","高温","晴朗","高温","高温",
+         "高温","沙暴","沙暴","高温","高温",
+         "晴朗","晴朗","高温","晴朗","沙暴",
+         "高温","晴朗","晴朗","高温","高温"
+         ]
 
-# 创建一个优化问题对象，名称为"Rainforest Adventure"，目标类型为最大化
-model = pl.LpProblem("Rainforest Adventure", pl.LpMaximize)
-# 创建决策变量x_{ti}，表示第t天玩家是否位于区域i
-x = pl.LpVariable.dicts("x", [(t, i) for t in range(T+1)
-                        for i in range(N)], 0, 1, pl.LpInteger)
+base_consume_water=[5,8,10]
+base_consume_food=[7,6,10]
 
-# 创建决策变量y_t，表示第t天玩家拥有的水数量
-y = pl.LpVariable.dicts("y", [t for t in range(T+1)], 0, None, pl.LpInteger)
+def get_weather(i):
+    if i=="高温":
+        return 1
+    if i=="晴朗":
+        return 0
+    else:
+        return 2
 
-# 创建决策变量z_t，表示第t天玩家拥有的食物数量
-z = pl.LpVariable.dicts("z", [t for t in range(T+1)], 0, None, pl.LpInteger)
+def go(hhday,road):
 
-# 创建决策变量S_t，表示第t天玩家拥有的资金
-S = pl.LpVariable.dicts("S", [t for t in range(T+1)], 0, None, pl.LpInteger)
-S[-1] = S_0
+    already_go=0
+    consume_water=0
+    consume_food=0
+    while already_go<road:
+        if hhday>30:
+            return -1,-1,-1
+        if get_weather(weather[hhday-1])!=2:
+            #print(hhday,"Day go",weather[hhday])
+            consume_food+=base_consume_food[get_weather(weather[hhday-1])]*2
+            consume_water+=base_consume_water[get_weather(weather[hhday-1])]*2
+            hhday+=1
+            already_go+=1
+        else:
+            #print(hhday, "Day dont go")
+            consume_food += base_consume_food[get_weather(weather[hhday-1])]
+            consume_water += base_consume_water[get_weather(weather[hhday-1])]
+            hhday += 1
+    return consume_water,consume_food,hhday
 
-# 创建决策变量r_{ti}，表示第t天玩家是否在区域i挖矿
-r = pl.LpVariable.dicts("r", [(t, i) for t in range(T+1)
-                        for i in range(N)], 0, 1, pl.LpInteger)
+base_water_price=5
+base_water_weight=3
+base_food_price=10
+base_food_weight=2
 
-# 创建决策变量b_{ti}，表示第t天玩家购买的第i种资源数量
-b = pl.LpVariable.dicts("b", [(t, i) for t in range(T+1)
-                        for i in range(2)], 0, None, pl.LpInteger)
-# 定义目标函数：最大化玩家的剩余资金
-model += S[T] + 0.5 * (P_1 * y[T] + P_2 * z[T]), "Objective"
-# 定义初始条件：玩家在第0天位于起点，并用初始资金购买水和食物
-model += x[0, 0] == 1, "Initial position"
-model += S[0] == S_0 - P_1 * b[0, 0] - P_2 * b[0, 1], "Initial fund"
-model += y[0] == b[0, 0], "Initial water"
-model += z[0] == b[0, 1], "Initial food"
+def possess_c(cur_water,cur_food,cur_money,cur_day,log):
+    can_take=1200-cur_water*3-cur_food*2
+    #print(can_take)
+    #print(cur_money)
+    log=log+"At Day "+str(cur_day)+": "+"Reach c water and food "+str(cur_water)+" "+str(cur_food)+"\n"
+    i=0
+    if cur_day>18:
+        # 准备返程 尽可能只携带足以到达终点的物资
+        temp_water=max(36,cur_water)
+        temp_food=max(40,cur_food)
+        i=temp_water-cur_water
+        j=temp_food-cur_food
+        temp_money = cur_money - i* base_water_price * 2-j*base_food_price*2
+    else:
+        # 由于起始点倾向于购买性价比更好的食物，所以这里倾向于购买水已装满背包
+        i=int(can_take/base_water_weight)
+        j=0
+        temp_water=cur_water+i
+        temp_food=cur_food
+        temp_money=cur_money-i*base_water_price*2
 
-# 定义终止条件：玩家在第T天或之前到达终点，并退回剩余的水和食物
-model += x[T, N-1] == 1, "Final position"
-model += pl.lpSum(x[t, N-1] for t in range(T)) <= 1, "Only one arrival"
+    newlog=log+"At Day "+str(cur_day)+": "+"Buy water and food "+str(i)+" "+"\n"
+    q,w,e=go(cur_day,3)
+    temp_water1=temp_water-q
+    temp_food1=temp_food-w
+    newlog+="At Day "+str(e)+": "+"Move End water and food "+str(temp_water1)+" "+str(temp_food1)+"\n"
+    possess_z(temp_water1,temp_food1,temp_money,e,newlog)
 
-# 定义行走条件：玩家每天只能从一个区域到达相邻的另一个区域或原地停留，并且沙暴日必须原地停留
-for t in range(T):
-    model += pl.lpSum(x[t, i]
-                      for i in range(N)) == 1, f"Only one position at day {t}"
-    for i in range(N):
-        for j in range(N):
-            model += x[t, i] + x[t+1, j] <= p[i, j] + \
-                1, f"Adjacent movement from {i} to {j} at day {t}"
-        model += x[t, i] + \
-            x[t+1, i] >= 3, f"Stay at {i} at day {t} if sandstorm"
+    newlog = log+"At Day "+str(cur_day)+": "+"Buy water and food "+str(i)+ "\n"
+    q, w, e = go(cur_day, 2)
+    temp_water2 = temp_water - q
+    temp_food2 = temp_food - w
+    newlog += "At Day " + str(e) + ": " + "Move Mine water and food " + str(temp_water2) + " " + str(
+        temp_food2) + "\n"
+    posseess_k(temp_water2, temp_food2, temp_money, e,newlog)
 
-# 定义资源条件：玩家每天拥有的水和食物质量之和不能超过负重上限，并且不能耗尽
-for t in range(T+1):
-    model += y[t] + z[t] * W_2 <= L, f"Weight limit at day {t}"
-    model += y[t] >= 0, f"Water nonnegative at day {t}"
-    model += z[t] >= 0, f"Food nonnegative at day {t}"
 
-# 定义资金条件：玩家每天拥有的资金不能为负数，并且不能多次在起点购买资源
-for t in range(T+1):
-    model += S[t] >= 0, f"Fund nonnegative at day {t}"
-model += pl.lpSum(b[t, 0] + b[t, 1] for t in range(1, T+1)
-                  ) <= M * (1 - x[0, 0]), "No more purchase at start point"
+log_list={}
+def possess_z(cur_water,cur_food,cur_money,cur_day,log):
+    #print("END ",cur_water*5/2+cur_food*10/2+cur_money,cur_day)
+    log+="End "+str(cur_day)+" "+str(cur_water*5/2+cur_food*10/2+cur_money)
+    if cur_water<0 or cur_food<0:
+        return -1
+    log_list[log]=cur_water*5/2+cur_food*10/2+cur_money
+    return cur_water*5/2+cur_food*10/2+cur_money
 
-# 定义挖矿条件：玩家只能在矿山区域挖矿，并且到达矿山当天不能挖矿
-for t in range(1, T+1):
-    for i in range(N):
-        # model += r[t,
-        #            i] <= area_type[i] == 2, f"Only mine at mine area {i} at day {t}"
-        model += r[t, i] + \
-            x[t-1, i] <= 1, f"No mine at arrival at area {i} at day {t}"
+def posseess_k(cur_water,cur_food,cur_money,cur_day,log):
+    log = log + "At Day " + str(cur_day) + ": " + "Reach M water and food " + str(cur_water) + " " + str(
+        cur_food) + "\n"
+    water_limit=cur_water/(base_consume_water[get_weather("晴朗")]*3)
+    food_limit=cur_food/(base_consume_food[get_weather("晴朗")]*3)
+    total_limit=int(min(water_limit,food_limit))
+    total_limit=min(total_limit,30-cur_day)
 
-# 定义购买条件：玩家只能在起点或村庄区域购买资源，并且价格与基准价格有关
-for t in range(T+1):
-    for i in range(2):
-        model += b[t,
-                   i] >= 0, f"Purchase nonnegative for resource {i} at day {t}"
-        model += b[t, i] <= M * (area_type[i] ==
-                                 3), f"Only purchase at village area for resource {i} at day {t}"
-    model += S[t] == S[t-1] + pl.lpSum(G * r[t, i] * (area_type[i] == 2) for i in range(N)) - pl.lpSum(
-        2 * 5 * b[t, i] * (area_type[i] == 3) for i in range(2)), f"Fund change at day {t}"
+    for i in range(1,total_limit+1):
+        temp_food=cur_food
+        temp_water=cur_water
+        temp_day=cur_day
+        newlog=log
+        temp_money=cur_money
 
-##3##
+        for j in range(1,i+1):
+            temp_water=temp_water-base_consume_water[get_weather(weather[cur_day+j-2])]*3
+            temp_food=temp_food-base_consume_food[get_weather(weather[cur_day+j-2])]*3
+            temp_day+=1
+            temp_money+=1000
+            newlog+="At Day " + str(temp_day) + ": " + "Dig " + str(j)+" Days "+str(temp_water) + " " + str(
+            temp_food) +" " + str(temp_money)+ "\n"
 
-# 选择CBC求解器，它是PuLP自带的一个开源求解器
-solver = pl.PULP_CBC_CMD()
-# 调用求解器来求解优化问题
-status = model.solve(solver)
 
-# 打印求解状态
-print("Status:", pl.LpStatus[status])
+        q, w, e = go(temp_day, 2)
+        if q < 0:
+            continue
+        temp_water2 = temp_water - q
+        temp_food2 = temp_food - w
 
-# 如果求解成功，打印最优目标值和最优决策变量值
-if status == pl.LpStatusOptimal:
-    print("Objective:", model.objective.value())
-    for v in model.variables():
-        print(v.name, "=", v.varValue)
+        if temp_food2 < 0 or temp_water2 < 0:
+            continue
+        newlog += "At Day " + str(e) + ": " + "Go Village water and food " + str(temp_water2) + " " + str(
+            temp_food2) + "\n"
+        possess_c(temp_water2, temp_food2, temp_money, e, newlog)
 
-# 如果求解成功，打印最优策略和相关信息
-if status == pl.LpStatusOptimal:
-    print("恭喜你，你已经成功完成了雨林探险游戏！")
-    print("你的最终剩余资金为：", model.objective.value(), "元")
-    print("你的最终剩余水和食物数量为：", y[T].varValue, "箱和", z[T].varValue, "箱")
-    print("以下是你每天的决策：")
-    for t in range(T+1):
-        # 找出玩家所在的区域
-        for i in range(N):
-            if x[t, i].varValue == 1:
-                area = i
-                break
-        # 打印玩家所在的区域
-        print(f"第{t}天，你位于区域{area}，")
-        # 如果是起点或村庄，打印玩家购买的资源数量
-        if area_type[area] in [1, 3]:
-            print(f"你购买了{b[t,0].varValue}箱水和{b[t,1].varValue}箱食物，")
-        # 如果是矿山，打印玩家是否挖矿
-        if area_type[area] == 2:
-            if r[t, area].varValue == 1:
-                print("你选择了挖矿，")
-            else:
-                print("你没有选择挖矿，")
-        # 打印玩家消耗的资源数量
-        print(f"你消耗了{A[t]}箱水和{B[t]}箱食物。")
+        q,w,e=go(temp_day,5)
+        if q<0:
+            continue
+        temp_water1=temp_water-q
+        temp_food1=temp_food-w
+
+
+        if temp_food1<0 or temp_water1<0:
+            continue
+
+        newlog += "At Day " + str(e) + ": " + "Go end water and food " + str(temp_water1) + " " + str(
+            temp_food1) + "\n"
+        possess_z(temp_water1,temp_food1,temp_money,e,newlog)
+
+
+def check(i,j):
+    if 3*i+2*j>1200 or 5*i+10*j>10000:
+        return False
+    else:
+        return True
+
+def train():
+    i=0
+    for init_water in range(150,200):
+        for init_food in range(300,360):
+            i+=1
+            if check(init_water, init_food):
+                q,w,e=go(1,6)
+                log=""
+                possess_c(init_water-q,init_food-w,money,e,log)
+    print(i)
+train()
+max=-1
+max_index=0
+for i in log_list:
+    if log_list[i]>max:
+        max=log_list[i]
+        max_index=i
+print(max_index)
+
+import matplotlib.pyplot as plt
+
+index=0
+x=[]
+y=[]
+for i in log_list:
+    x.append(index)
+    index+=1
+    y.append(log_list[i])
+
+plt.scatter(x, y, alpha=0.6)
+plt.show()
