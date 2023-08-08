@@ -65,6 +65,24 @@ def check(i, j):
         return True
 
 
+# 功能算法
+def Dijktra(start: int, mgraph: list) -> list:
+    passed = [start]
+    nopass = [x for x in range(len(mgraph)) if x != start]
+    dis = mgraph[start]
+
+    while len(nopass):
+        idx = nopass[0]
+        for i in nopass:
+            if dis[i] < dis[idx]: idx = i
+
+        nopass.remove(idx)
+        passed.append(idx)
+
+        for i in nopass:
+            if dis[idx] + mgraph[idx][i] < dis[i]: dis[i] = dis[idx] + mgraph[idx][i]
+    return dis
+
 dp = np.full((30, 30, 600, 600), -1 * np.inf)
 
 # log 记录
