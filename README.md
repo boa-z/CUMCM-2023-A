@@ -8,9 +8,7 @@
 
 ## 分工
 
-Y: 建模 + matlab
-ZY: 建模 + python
-BOA: 论文 + 查文献 + python
+unknow
 
 ### 比赛期间
 
@@ -71,28 +69,23 @@ BOA: 论文 + 查文献 + python
 5. 不完整的论文可以接受，如果实在解不出来可以放弃部分小问
 6. 2021美赛必须限制在么25页以内，目录摘要都算页数
 
-## 比赛位置
+## 智慧树重点提取
 
-建议让Y住过来，E可以提供床
+1. 2023上电-智慧树赛前学习资源：K475450
+2. [历年赛题](http://www.mcm.edu.cn/html_cn/block/8579f5fce999cdc896f78bca5d4f8237.html)
+3. zzbl
 
-建议前往复旦大学光华楼研讨
+    * [中国大学生在线数学建模专题](https://dxs.moe.gov.cn/zx/hd/sxjm/)
+    * [多维度学习数学建模A题](https://dxs.moe.gov.cn/zx/hd/sxjm/dwdxxsxjm/dwdxxsxjm-qgdxssxjmjsAt.shtml)
+    * [官方优秀论文展示](https://dxs.moe.gov.cn/zx/hd/sxjm/sxjmlw/2022qgdxssxjmjslwzs/2022gjsbqgdxssxjmjslwzs.shtml)
+    * [赛题讲评](https://dxs.moe.gov.cn/zx/hd/sxjm/sxjmstjp/)
+    * [数学建模专题推荐](https://dxs.moe.gov.cn/zx/hd/sxjm/sxjmzttj.shtml)
 
-后面再看 -- 看学校安排
-
-## 鼠鼠智慧树重点提取
-
-（1）2023上电-智慧树赛前学习资源：K475450
-（2）[历年赛题](http://www.mcm.edu.cn/html_cn/block/8579f5fce999cdc896f78bca5d4f8237.html)
-（3）[中国大学生在线数学建模专题](https://dxs.moe.gov.cn/zx/hd/sxjm/)
-[多维度学习数学建模A题](https://dxs.moe.gov.cn/zx/hd/sxjm/dwdxxsxjm/dwdxxsxjm-qgdxssxjmjsAt.shtml)
-[官方优秀论文展示](https://dxs.moe.gov.cn/zx/hd/sxjm/sxjmlw/2022qgdxssxjmjslwzs/2022gjsbqgdxssxjmjslwzs.shtml)
-[赛题讲评](https://dxs.moe.gov.cn/zx/hd/sxjm/sxjmstjp/)
-[数学建模专题推荐](https://dxs.moe.gov.cn/zx/hd/sxjm/sxjmzttj.shtml)
-（4）B站大学（bilibili）数学建模
+4. B站大学（bilibili）数学建模
 华南理工大学：数模挖掘机_SCUT
 武汉科技大学：WUST数学建模
 山东赛区2020培训：白瓷梅子蛋花汤
-（5）上海赛区2023年赛前培训8月26，27日（周六、日）（具体安排另附），方式：线上培训，借助高教社小鹅通平台。
+5. 上海赛区2023年赛前培训8月26，27日（周六、日）（具体安排另附），方式：线上培训，借助高教社小鹅通平台。
 
 建模优秀论文和源程序
 

@@ -84,79 +84,107 @@ def dp_main():
     cur_day = 0
 
     # 起点购买物资
-    for init_food in range(0, 600):
-        init_water = (carry_limit - base_food_weight * init_food) // base_water_weight
+    for init_food in range(200, 350):
+        init_water = (carry_limit - base_food_weight *
+                      init_food) // base_water_weight
         if check(init_food, init_water):
             dp[0][1][init_food][init_water] = init_money - base_consume_food[get_weather(cur_day)] * init_food - \
-                                              base_consume_water[
-                                                  get_weather(cur_day)] * init_water
+                base_consume_water[get_weather(cur_day)] * init_water
 
     cur_money = 10000
-    for cur_day in range(0, 29):
+    for cur_day in range(0, 26):
         for cur_point in range(1, 27):
 
             # 在村庄物资更新
-            # if Map[cur_point].state == "c":
-            #     for buy_food in range(0, 600):
-            #         for buy_water in range(0, 400):
-            #             for cur_food in range(0, 600):
-            #                 for cur_water in range(0, 400):
-            #                     if check(cur_food, cur_water):
-            #                         dp[cur_day, cur_point, buy_food + cur_food, buy_water + cur_water] = max(
-            #                             dp[cur_day, cur_point, buy_food + cur_food, buy_water + cur_water], dp[
-            #                                                                                             cur_day, cur_point, cur_food, cur_water] -
-            #                                                                                         base_consume_food[
-            #                                                                                             get_weather(
-            #                                                                                                 cur_day)] * cur_food -
-            #                                                                                         base_consume_water[
-            #                                                                                             get_weather(
-            #                                                                                                 cur_day)] * cur_water)
+            if Map[cur_point].state == "c":
+                for buy_food in range(0, 50):
+                    for buy_water in range(0, 200):
+                        for cur_food in range(200, 350):
+                            for cur_water in range(100, 250):
+                                if check(buy_food + cur_food, buy_water + cur_water):
+                                    dp[cur_day, cur_point, buy_food + cur_food, buy_water + cur_water] = max(
+                                        dp[cur_day, cur_point, buy_food +
+                                            cur_food, buy_water + cur_water],
+                                        dp[cur_day, cur_point, cur_food, cur_water] -
+                                        base_consume_food[get_weather(
+                                            cur_day)] * buy_food
+                                        - base_consume_water[get_weather(cur_day)] * buy_water)
 
             # 挖矿
-            # if Map[cur_point].state == "k":
-            #     for cur_food in range(0, 600):
-            #         for cur_water in range(0, 400):
-            #             dp[cur_day + 1, cur_point, cur_food - 3 * base_consume_water[
-            #                 get_weather(cur_day)], cur_water - 3 *
-            #                base_consume_food[
-            #                    get_weather(cur_day)]] = max(dp[cur_day + 1, cur_point, cur_food - 3 *
-            #                                                    base_consume_water[get_weather(cur_day)], cur_water - 3 *
-            #                                                    base_consume_food[
-            #                                                        get_weather(cur_day)]],
-            #                                                 dp[cur_day, cur_point, cur_food, cur_water] + base_income)
+            if Map[cur_point].state == "k":
+                for cur_food in range(0, 350):
+                    for cur_water in range(0, 250):
+                        dp[cur_day + 1, cur_point, cur_food - 3 * base_consume_water[
+                            get_weather(cur_day)], cur_water - 3 * base_consume_food[
+                               get_weather(cur_day)]] = max(dp[cur_day + 1, cur_point, cur_food - 3 *
+                                                               base_consume_water[get_weather(cur_day)], cur_water - 3 *
+                                                               base_consume_food[
+                                                                   get_weather(cur_day)]],
+                                                            dp[cur_day, cur_point, cur_food, cur_water] + base_income)
 
             # 停留
-            # for food in range(0, 600):
-            #     for water in range(0, 400):
-            #         dp[cur_day + 1, cur_point, food - base_consume_water[get_weather(cur_day)], water -
-            #            base_consume_food[get_weather(cur_day)]] = max(
-            #             dp[cur_day + 1, cur_point, food - base_consume_water[get_weather(cur_day)], water -
-            #                base_consume_food[get_weather(cur_day)]], dp[cur_day, cur_point, food, water])
+            for food in range(0, 250):
+                for water in range(0, 150):
+                    dp[cur_day + 1, cur_point, food - base_consume_water[get_weather(cur_day)], water -
+                       base_consume_food[get_weather(cur_day)]] = max(
+                        dp[cur_day + 1, cur_point, food - base_consume_water[get_weather(cur_day)], water -
+                           base_consume_food[get_weather(cur_day)]], dp[cur_day, cur_point, food, water])
 
             # 移动
             for cur_point_new in Map[cur_point].neibor:
                 cur_food = 0
                 cur_water = 0
 
-                for init_food in range(100, 600):
-                    for init_water in range(100, 400):
+                for init_food in range(0, 350):
+                    for init_water in range(0, 250):
                         if check(init_food, init_water):
                             cur_food = init_food
                             cur_water = init_water
                             cur_day_new = cur_day + 1
-                            cur_food_new = cur_food - 2 * base_consume_food[get_weather(cur_day)]
-                            cur_water_new = cur_water - 2 * base_consume_water[get_weather(cur_day)]
-                    # dp[cur_day_new, cur_point_new, cur_food_new, cur_water_new] = max(
-                    #     dp[cur_day_new, cur_point_new, cur_food_new, cur_water_new],
-                    #     dp[cur_day, cur_point, cur_food, cur_water])
-                    # print("kaka4", dp[0, 1, 240, 240])
-                            dp[cur_day_new, cur_point_new, cur_food_new, cur_water_new] = dp[cur_day, cur_point, cur_food, cur_water]
-                            # print(dp[cur_day_new, cur_point_new, cur_food_new, cur_water_new], cur_day_new, cur_point_new, cur_food_new, cur_water_new)
+                            cur_food_new = cur_food - 2 * \
+                                base_consume_food[get_weather(cur_day)]
+                            cur_water_new = cur_water - 2 * \
+                                base_consume_water[get_weather(cur_day)]
+                            dp[cur_day_new, cur_point_new, cur_food_new, cur_water_new] = max(
+                                dp[cur_day_new, cur_point_new,
+                                    cur_food_new, cur_water_new],
+                                dp[cur_day, cur_point, cur_food, cur_water])
+
+                            # dp[cur_day_new, cur_point_new, cur_food_new, cur_water_new] = dp[cur_day, cur_point, cur_food, cur_water]
+                            if Map[cur_point].state == "z":
+                                # log += "End " + \
+                                #     str(cur_day)+" "+str(cur_water *
+                                #                          5/2+cur_food*10/2+cur_money)
+                                # log_list[log] = cur_water*5 / \
+                                #     2+cur_food*10/2+cur_money
+                                print(dp[cur_day_new, cur_point_new, cur_food_new, cur_water_new],
+                                      cur_day_new, cur_point_new, cur_food_new, cur_water_new)
                 # for k in range(210, 240):
-                #     for l in range(210, 240):                    
+                #     for l in range(210, 240):
                 #         print("kaka5", dp[1, 2, k, l], k, l)
                     # dp[cur_day, cur_point, cur_food, cur_water] dp[0, 1]
                     # print(dp[cur_day_new, cur_point_new, cur_food_new, cur_water_new], cur_day, cur_point, cur_food, cur_water)
 
+    # max_money = -float('inf')
+    # opt_day = None
+    # opt_point = None
+    # opt_food = None
+    # opt_water = None
+
+    # for day in range(29, -1, -1):
+    #     for point in range(1, 27):
+    #         for food in range(600):
+    #             for water in range(400):
+    #                 if dp[day, point, food, water] > max_money:
+    #                     max_money = dp[day, point, food, water]
+    #                     opt_day = day
+    #                     opt_point = point
+    #                     opt_food = food
+    #                     opt_water = water
+
+    # print("最优方案:")
+    # print("到达第{}天,在第{}点".format(opt_day, opt_point))
+    # print("剩余食物:{},剩余水:{}".format(opt_food, opt_water))
+    # print("剩余资金:{}".format(max_money))
+
 dp_main()
-print(1)

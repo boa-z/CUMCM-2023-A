@@ -289,13 +289,8 @@ def dp_all(problem_no):
     final_pt: 'Solution' = None
     # 得到最优解的水和食物的组合
     max_ij = (0, 0)
-    # foodWaterSearched = list()
-    # for init_water in range(0, MAX_BURDEN // WATER_WEIGHT + 1):
     for init_water in range(177, 179):
-        # init_water = i // WATER_WEIGHT
         init_food = (MAX_BURDEN - init_water * WATER_WEIGHT) // FOOD_WEIGHT
-        # if (init_water, init_food) not in foodWaterSearched:
-        # foodWaterSearched.append((init_water, init_food))
         final, max_final = dp_main(init_water, init_food)
 
         # 新的水和食物的组合获得的最优解和之前的全局最优解比较，取最大的
