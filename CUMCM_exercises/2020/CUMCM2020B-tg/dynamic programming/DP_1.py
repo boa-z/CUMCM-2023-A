@@ -289,7 +289,7 @@ def dp_all(problem_no):
     final_pt: 'Solution' = None
     # 得到最优解的水和食物的组合
     max_ij = (0, 0)
-    for init_water in range(177, 179):
+    for init_water in range(129, 131):
         init_food = (MAX_BURDEN - init_water * WATER_WEIGHT) // FOOD_WEIGHT
         final, max_final = dp_main(init_water, init_food)
 

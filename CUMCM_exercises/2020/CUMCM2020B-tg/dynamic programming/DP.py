@@ -1,5 +1,6 @@
 from random import random,choice,shuffle
 
+
 class Point:
     def __init__(self,index):
         self.name=index
@@ -58,7 +59,7 @@ class Decision:
 WEATHER=[]
 DAY_NUM=0
 MAX_BURDEN=0
-INIT_MONRY=0
+INIT_MONEY=0
 PROFIT=0
 WATER_WEIGHT=0
 WATER_PRICE=0
@@ -94,7 +95,7 @@ def loadEnvir(problem_no):
     global WEATHER
     global DAY_NUM
     global MAX_BURDEN
-    global INIT_MONRY
+    global INIT_MONEY
     global PROFIT
     global WATER_WEIGHT
     global WATER_PRICE
@@ -173,7 +174,7 @@ def dp_main(init_water,init_food,start_day=0,init_pt=0,init_money=None,all_path=
             solution[i].append({})            
     cur_key=getKey(init_water,init_food)
     if init_money==None:
-        init_m=INIT_MONRY-init_water*WATER_PRICE-init_food*FOOD_PRICE
+        init_m= INIT_MONEY - init_water * WATER_PRICE - init_food * FOOD_PRICE
     else:
         init_m=init_money
     solution[start_day][init_pt][cur_key]=Solution(start_day,None,init_m,init_pt,cur_key)
