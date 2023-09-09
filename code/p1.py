@@ -11,8 +11,10 @@ df = pd.read_excel('/Users/boa/Documents/2023-2024-1暑假/CUMCM2023/data/附件
 D = 0
 
 latitude = 39.4128  # 纬度
-elevation = 3000  # 海拔
-local_time = datetime(2023, 1, 21, 9, 0)  # 当地时间，原题中ST
+elevation = 3  # 海拔
+local_time = datetime(2023, 6, 21, 9, 0)  # 当地时间，原题中ST
+
+boa_error = []  # 用来存储计算出错的镜面的索引
 
 eta_ref = 0.9  # 镜面反射率
 
@@ -34,7 +36,8 @@ tower_box_vertices = np.array([  # 顺序？？？？
 def calc_solar(local_time, latitude, elevation):
     # Constants
     G0 = 1366  # Solar constant in W/m^2 (太阳常数)
-    H = elevation / 1000  # Convert elevation from meters to kilometers
+    # H = elevation / 1000  # Convert elevation from meters to kilometers
+    H = elevation
 
     # Calculate D, the number of days since spring equinox (March 21)
     spring_equinox = 21  # March 21
@@ -63,17 +66,20 @@ def calc_solar(local_time, latitude, elevation):
                   (math.cos(as_radians) * math.cos(math.radians(latitude)))
 
     if local_time.hour < 12:
-        sin_gamma_s = abs(math.sqrt(1 - cos_gamma_s ** 2))
+        sin_gamma_s = math.sqrt(1 - cos_gamma_s ** 2)
     elif local_time.hour == 12:
         sin_gamma_s = 0
     else:
-        sin_gamma_s = - abs(math.sqrt(1 - cos_gamma_s ** 2))
+        sin_gamma_s = math.sqrt(1 - cos_gamma_s ** 2)
+
+    if sin_gamma_s < 0:
+        print(sin_gamma_s)
 
     # Calculate DNI using the formula
     a = 0.4237 - 0.00821 * (6 - H) ** 2
     b = 0.5055 + 0.00595 * (6.5 - H) ** 2
     c = 0.2711 + 0.01858 * (2.5 - H) ** 2
-    dni = G0 * (a + b * math.exp(-c / math.sin(as_radians)))
+    dni = G0 * (a + b * math.exp(-c / sin_as))
 
     return {
         # as_degrees, gamma_s_degrees, math.degrees(delta), dni
@@ -86,9 +92,12 @@ def calc_solar(local_time, latitude, elevation):
 def calc_ni_m1(AO):
     sin_as, cos_as, cos_gamma_s, sin_gamma_s, _, _ = calc_solar(local_time, latitude, elevation)
     # Calculate unit vector i
-    i = np.array([-cos_as * sin_gamma_s,
-                  -cos_as * cos_gamma_s,
-                  -sin_as])
+    # i = np.array([-cos_as * sin_gamma_s,
+    #               -cos_as * cos_gamma_s,
+    #               -sin_as])
+    i = np.array([cos_as * sin_gamma_s,
+                  cos_as * cos_gamma_s,
+                  sin_as])
 
     # Calculate unit vector n
     norm_AO = np.linalg.norm(AO)
@@ -109,7 +118,6 @@ def calc_r_m1(n, i):
 def calc_eta_cos(n, i) -> 'float':
     # Calculate cosine of the angle theta (eta_cos)
     eta_cos = np.dot(i, n)
-
     return eta_cos
 
 
@@ -158,7 +166,13 @@ def mirror_point(heli_para) -> 'tuple[np.ndarray,np.ndarray,np.ndarray,np.ndarra
         x0 ** 2 + y0 ** 2 + m ** 2 * cos_as ** 2 - 2 * cos_as * m * (
                     x0 * sin_gamma_s - y0 * cos_as))
 
-    theta_s = math.asin(numerator_theta_s / denominator_theta_s)
+    # TODO: asin 会遇到参数超过 -1,1 的情况，需要处理
+    if numerator_theta_s / denominator_theta_s > 1 or numerator_theta_s / denominator_theta_s < -1:
+        print(heli_para)
+        boa_error.append(heli_para)
+        theta_s = math.asin(1)
+    else:
+        theta_s = math.asin(numerator_theta_s / denominator_theta_s)
 
     x1 = x0 + 0.5 * w * np.cos(theta_s) - 0.5 * w * np.sin(theta_s)
     x2 = x0 - 0.5 * w * np.cos(theta_s) - 0.5 * w * np.sin(theta_s)
@@ -233,9 +247,12 @@ def ray_box_intersection(ray_origin, ray_direction, box_vertices):
 def calc_shadow(heli_para, tower_para):
     pre_shadows = find_points_within_distance(df, heli_para[:3], 2, 20)  # 可能干扰的坐标的合集
     shadow_count = 0
+
+    # little_mirror = Station(heli_para, tower_para)
+    little_mirror_centers = mirror_split(heli_para)
+    # 将ndarray 转化为 list
+    little_mirror_centers = little_mirror_centers.tolist()
     for pre_shadow in pre_shadows:
-        little_mirror = Station(pre_shadow, tower_para)
-        little_mirror_centers = mirror_split(little_mirror.heli_para)
         little_mirror_blocked = []
         for little_mirror_center in little_mirror_centers:
             # 计算镜面中心到接受塔中心的单位向量
@@ -245,8 +262,8 @@ def calc_shadow(heli_para, tower_para):
             pre_shadow_full = pre_shadow
             a, b, c, d = mirror_point(pre_shadow_full)
 
-            # 计算镜面中心到接受塔中心的单位向量
-            little_mirror_center_to_tower = np.array([tower_para[0] - little_mirror.heli_para[0], tower_para[1] - little_mirror.heli_para[1], tower_para[2] - little_mirror.heli_para[2]])
+            # 计算拆分后镜面中心到接受塔中心的单位向量
+            little_mirror_center_to_tower = np.array([tower_para[0] - heli_para[0], tower_para[1] - heli_para[1], tower_para[2] - heli_para[2]])
             norm_little_mirror_center_to_tower = np.linalg.norm(little_mirror_center_to_tower)  # calculate the norm of AO
             little_mirror_center_to_tower_normalized = little_mirror_center_to_tower / norm_little_mirror_center_to_tower
             # reflect_vector = little_mirror.heli_para[5][0]  # 入射光线反方向的单位向量 i，此处疑似有误
@@ -266,9 +283,14 @@ def calc_shadow(heli_para, tower_para):
 
             if t >= 0 and b1 >= 0:
                 continue
+            little_mirror_centers.remove(little_mirror_center)
             shadow_count += 1
-    # print(shadow_count)
-    etc_sb = shadow_count / (split_num*split_num - shadow_count)  # 阴影遮挡效率
+
+    if shadow_count == split_num*split_num:
+        etc_sb = 1
+    else:
+        etc_sb = shadow_count / (split_num*split_num)  # 阴影遮挡效率
+
     return etc_sb
 
 
@@ -297,8 +319,33 @@ def collector_cut_off_efficiency(heli_para, tower_para):
             # print(little_mirror_center, collector_cut_off_count) # 看看小块计数
 
     etc_trunc = 1 - collector_cut_off_count / (split_num * split_num - collector_cut_off_count)  # collector_cut_off_efficiency
-
     return etc_trunc
+
+
+# 大气透射率
+def calc_eta_at(heli_para, tower_para):
+    origin_mirror = Station(heli_para, tower_para)
+    dhr = origin_mirror.dhr
+    eta_at = 0.993121 - 0.0001176 * dhr + 1.97e-8 * dhr ** 2
+    return eta_at
+
+# 计算光学效率 eta = eta_cos * eta_sb * eta_trunc * eta_ref * eta_at
+def each_mirror_output_all(heli_para, tower_para):
+    eta_cos = Station(heli_para, tower_para).eta_cos
+    eta_sb = calc_shadow(heli_para, tower_para)
+    eta_trunc = collector_cut_off_efficiency(heli_para, tower_para)
+    eta_at = calc_eta_at(heli_para, tower_para)
+    eta = eta_cos * eta_sb * eta_trunc * eta_ref * eta_at
+
+    # 计算单位面积镜面平均输出热功率 E_{field} = DNI \times \sum_{i}^{N} A_i \eta_i
+    # 此处计算后，真的 e_field 还需要求和
+    # heliostat_lighting_area 直接安排上， 6*6 即可
+    _, _, _, _, _, dni = calc_solar(local_time, latitude, elevation)
+    e_field = dni * split_num * split_num * eta
+    mirror_output_all = [eta_cos, eta_sb, eta_trunc, eta_at, eta, e_field]
+    # print(mirror_output_all)
+    # print(dni)
+    return mirror_output_all
 
 # heliostat n. 定日镜
 
@@ -312,7 +359,7 @@ class Station:
         tower_loc = np.array([tower_para[0], tower_para[1], tower_para[2]])
         heli_loc = np.array(heli_loc)
         tower_loc = np.array(tower_loc)
-        dhr = np.linalg.norm(heli_loc - tower_loc)
+        self.dhr = np.linalg.norm(heli_loc - tower_loc)
 
         # 计算镜面中心到接受塔中心的单位向量
         ao = np.array([tower_para[0] - heli_para[0],  tower_para[1] - heli_para[1],
@@ -328,86 +375,6 @@ class Station:
         # self.heli_para[5].append(n), self.heli_para[5].append(i)
         # 现在的问题是每次查找似乎都会append一次，导致列表中有很多重复的元素，故删除这一功能
 
-# 计算光学效率 eta = eta_cos * eta_sb * eta_trunc * eta_ref
-def eta(eta_cos, eta_sb, eta_trunc, eta_ref):
-    return eta_cos * eta_sb * eta_trunc * eta_ref
-
-# 计算单位面积镜面平均输出热功率 E_{field} = DNI \times \sum_{i}^{N} A_i \eta_i
-def e_field(dni, heliostat_lighting_area, eta):
-    # heliostat_lighting_area 直接安排上， 6*6 即可
-    e_field = dni * heliostat_lighting_area * eta
-    return e_field
 
 # 答辩测试区
-heli_test = Station((107.250, 91.664, 4, 6, 6, []), [0, 0, 84])
-
-# mirror_point_test = mirror_point(heli_test.heli_para, solar_altitude_angle, solar_azimuth_angle)
-# print(mirror_point_test)
-
-heli_test_shadow_count = calc_shadow(heli_test.heli_para, heli_test.tower_para)
-print("heli_test_shadow_count: " + str(heli_test_shadow_count))
-
-collector_cut_off_efficiency_test = collector_cut_off_efficiency(heli_test.heli_para, heli_test.tower_para)
-print("collector_cut_off_efficiency_test" + str(collector_cut_off_efficiency_test))
-
-# 计算所有镜子的平均效率啥的
-# prompt: 下面是一个关于Station的类，其中初始化输入 heli_para、tower_para 为列表，表示x,y,z轴坐标。
-# heli_para 的x,y从df中读取，df的格式见附录，z为定值4，tower_para = [0, 0, 84]
-# 请写一段python代码，通过.eta_cos可以获取 eta_cos的值，遍历df所有的值，输出到列表 heli_output 中
-
-# 设置起始日期，这里以2023年1月21日为例
-start_date = datetime(2023, 1, 21)
-
-# 设置结束日期，这里以2023年12月21日为例
-end_date = datetime(2023, 12, 21)
-
-# 定义要打印的时间列表
-times = ["9:00", "10:30", "12:00", "13:30", "15:00"]
-
-heli_output_avg = []
-avg_month_eta_cos = []
-avg_month_eta_sb = []
-avg_month_eta_trunc = []
-
-# 循环遍历每个月的21日
-current_date = start_date
-while current_date <= end_date:
-    avg_times_eta_cos = []
-    avg_times_eta_sb = []
-    avg_times_eta_trunc = []
-    # 打印当前日期的每个时间
-    for time in times:
-        hour, minute = map(int, time.split(':'))
-        local_time = datetime(current_date.year, current_date.month, 21, hour, minute, 0)
-        heli_eta_cos_output = []
-        heli_eta_sb_output = []
-        heli_eta_trunc_output = []
-
-        for i, row in df.iterrows():
-            heli_para = [row['x坐标 (m)'], row['y坐标 (m)'], 4, 6, 6, []]
-            tower_para = [0, 0, 84]
-            station = Station(heli_para, tower_para)
-            heli_eta_cos_output.append(station.eta_cos)
-            # heli_eta_sb_output.append(calc_shadow(station.heli_para, station.tower_para))
-            heli_eta_trunc_output.append(collector_cut_off_efficiency(station.heli_para, station.tower_para))
-
-        # 计算平均值并添加到平均时间列表
-        avg_time_eta_cos = sum(heli_eta_cos_output) / len(heli_eta_cos_output)
-        avg_times_eta_cos.append(avg_time_eta_cos)
-        # avg_time_eta_sb = sum(heli_eta_sb_output) / len(heli_eta_sb_output)
-        # avg_times_eta_sb.append(avg_time_eta_sb)
-
-        avg_time_eta_trunc = sum(heli_eta_trunc_output) / len(heli_eta_trunc_output)
-        avg_times_eta_trunc.append(avg_time_eta_trunc)
-        print(local_time, avg_time_eta_cos)
-    # 计算5个时间的平均值的平均值并添加到月平均列表
-    avg_month_eta_cos.append(sum(avg_times_eta_cos) / len(avg_times_eta_cos))
-    # avg_month_eta_sb.append(sum(avg_times_eta_sb) / len(avg_times_eta_sb))
-    avg_month_eta_trunc.append(sum(avg_times_eta_trunc) / len(avg_times_eta_trunc))
-    print(avg_month_eta_cos, avg_month_eta_sb, avg_month_eta_trunc)
-
-    # 增加一个月
-    if current_date.month == 12:
-        current_date = current_date.replace(year=current_date.year + 1, month=1)
-    else:
-        current_date = current_date.replace(month=current_date.month + 1)
+heli_test = Station((-97.911, -45.299, 4, 6, 6, []), [0, 0, 84]) # 这个点会导致 sin 出错

@@ -1,66 +1,72 @@
-import math
-import pandas as pd
+# 请阅读代码，分析 point 数量不随函数输入的改变而改变
+
+# 导入matplotlib库，用于绘制图形
 import matplotlib.pyplot as plt
+import numpy as np
 
-def calculate_mirror_positions(R1, DM, Nhel1, LH, LW, desp):
-    def calculate_delta_alpha(R1, DM):
-        return 2 * math.asin(DM / (2 * R1))
+# 定义一个递增函数f(x) = 1.2x
+def f(x):
+    return 1.2 * x
 
-    def calculate_min_increment(DM, R1):
-        h = R1 - math.sqrt(R1**2 - (DM**2) / 4)
-        return DM * math.cos(math.radians(30)) - h
+#卡卡大厦基石
+def fondational_kabuilding(r,R,d,k):
+    # 圆的半径,内圆间隔，点的间隔，圆的个数
+    # R目前为无用参数，后续可用于绘制卡卡大厦的外圈，目前用f(r)代替，k控制内圆的个数
 
-    def calculate_Nhel_n(Nhel1, n):
-        return Nhel1 * (2**(n - 1))
+    # 创建一个新的图形
+    plt.figure()
+    # 设置坐标轴的范围和比例
+    plt.axis([-r, r, -r, r])
+    plt.axis('equal')
+    # 绘制一个以原点为中心，半径为r的圆
+    theta = np.linspace(0, 2*np.pi, 100)
+    x = r * np.cos(theta)
+    y = r * np.sin(theta)
+    plt.plot(x, y)
 
-    def calculate_R_n(R1, n):
-        return R1 * (2**(n - 1))
+    i=100
+    # 在x轴100之后半径递增生成一个个圆圈
+    for m in range(0, k): 
+        i=f(i)
+        x = i * np.cos(theta)
+        y = i * np.sin(theta)
+        plt.plot(x, y)
 
-    def calculate_Nrows_n(R1, delta_R_min, n):
-        return int((2**(n - 1) * R1) / delta_R_min)
+    # 定义一个空列表，用于存储所有点的坐标
+    points = []
+    # 定义一个变量，用于统计点的个数
+    count = 0
 
-    delta_alpha_z1 = calculate_delta_alpha(R1, DM)
-    delta_R_min = calculate_min_increment(DM, R1)
-    
-    result = []
-    for n in range(1, Nhel1 + 1):
-        Nhel_n = calculate_Nhel_n(Nhel1, n)
-        R_n = calculate_R_n(R1, n)
-        Nrows_n = calculate_Nrows_n(R1, delta_R_min, n)
-        
-        for i in range(Nrows_n):
-            row_radius = R_n - i * delta_R_min
-            for j in range(Nhel_n):
-                theta = j * (2 * math.pi / Nhel_n)
-                x = row_radius * math.cos(theta)
-                y = row_radius * math.sin(theta)
-                result.append((x, y))
-    
-    return result
+    # 在各圆圈上填充定日镜的点
+    for m in range(0, k):
+        # 计算当前圆圈的半径
+        i = f(100 * (1.2 ** m))
+        # 计算当前圆圈上可以放置多少个点
+        n = int(np.floor(2 * np.pi * i / d))
+        # 计算当前圆圈上每个点之间的角度差
+        delta = 2 * np.pi / n
+        # 遍历当前圆圈上的每个点
+        for k in range(n):
+            # 计算当前点的角度
+            angle = k * delta
+            # 计算当前点的坐标
+            x = i * np.cos(angle)
+            y = i * np.sin(angle)
+            # 将当前点的坐标添加到列表中
+            points.append((x, y))
+            # 将当前点绘制在图形上
+            plt.scatter(x, y, color='red')
+            # 点的个数加一
+            count += 1
+    print("The coordinates of all the points are:")
+    for point in points:
+        print(point)
+    print("The total number of points is:", count)
 
-def create_mirror_field_dataframe(R1, DM, Nhel1, LH, LW, desp):
-    mirror_positions = calculate_mirror_positions(R1, DM, Nhel1, LH, LW, desp)
-    df = pd.DataFrame(mirror_positions, columns=['X', 'Y'])
-    return df
-
-def plot_mirror_field(df):
-    plt.figure(figsize=(10, 10))  # 设置图像大小
-    plt.scatter(df['X'], df['Y'], marker='o', s=20, color='blue')  # 绘制散点图
-    plt.xlabel('X坐标')
-    plt.ylabel('Y坐标')
-    plt.title('镜场布置')
-    plt.grid(True)
-    plt.gca().set_aspect('equal', adjustable='box')  # 设置坐标轴等比例
     plt.show()
+    
+    return points
 
 
-# 示例用法
-R1 = 350  # 镜场首行的半径
-DM = 10   # 定日镜的特征圆直径
-Nhel1 = 6  # 镜场首行的定日镜数量
-LH = 2    # 定日镜的宽度
-LW = 4    # 定日镜的长度
-desp = 5  # 安全距离
-
-df = create_mirror_field_dataframe(R1, DM, Nhel1, LH, LW, desp)
-plot_mirror_field(df)
+fondational_kabuilding(700,100,12,20)
+#print(fondational_kabuilding(500,20,12,8))
