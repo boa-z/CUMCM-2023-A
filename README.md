@@ -176,4 +176,72 @@ $$
 
 阴影遮挡损失
 
-怎么说？？？
+蒙特卡罗光线追踪法
+
+prompt:
+假设 n 个点，已知每个点的坐标，求第k个点到其他点的距离。应该使用什么算法？
+
+假设我想知道第k个点到其他点的距离小于l的所有点的坐标，应该使用什么算法？
+
+此处距离l先随便设置一个，例如20m。
+
+现在所有点的坐标在dataframe中。请编写一个函数，输入为一个坐标，输入k，l，输出这个点到其他点的距离小于l的所有点的坐标。
+
+---
+
+假设已知三维空间中的一个矩形平面的四个顶点ABCD、矩形中心点O的坐标、矩形的长宽，请将矩形划分为n个小矩矩形，
+请写一段python 代码，求每个小矩阵的中心点的坐标和长宽，输出一个np.array，包含中心点的坐标和长宽？
+
+---
+
+由定日镜的镜面法向量进而可计算得出定日镜的俯仰角 $\theta_z$ 和方位角 $\theta_s$:
+
+$$
+\tan (\theta_z) = \frac{\sin (\alpha_s) \cdot m + h}{\sqrt{x_{o, A}^2 + y_{o, A}^2 + m^2 \cdot \cos ^2(\alpha_s) - 2 \cos (\alpha_s) \cdot m \cdot (x_{o, A} \cdot \sin (\gamma_s) - y_{o, A} \cdot \cos (\alpha_s))} } \\
+\sin (\theta_s) = \frac{x_{o, A} - \cos (\alpha_s) \cdot \sin (\gamma_s) \cdot m}{\sqrt{x_{o, A}^2 + y_{o, A}^2 + m^2 \cdot \cos ^2(\alpha_s) - 2 \cos (\alpha_s) \cdot m \cdot (x_{o, A} \cdot \sin (\gamma_s) - y_{o, A} \cdot \cos (\alpha_s))} } \\
+m = \sqrt{x_{o, A}^2 + y_{o, A}^2 + h_0^2} \\
+$$
+
+已知 $\alpha_s, \gamma_s, x, y, h$ 基于上面的公式，请写一段python程序，求 $\theta_z, \theta_s$。
+
+---
+
+写一个函数，解析列表 heli_para, heli_para 形如 [114, 114, 4, 6, 6] 中的值分别为 w, h, x0, y0, h0
+
+---
+
+写一个python函数，输入两个三维空间坐标，由此计算出一条直线的方程，再输入三个三维空间坐标，计算平面方程，判断交点是否在平面内。
+
+---
+
+little_mirror_centers 是由多个nparray组成的nparray，请在`if t >= 0 and b1 >= 0: continue` 后续写一段代码，判断成立时，将little_mirror_center这个值添加到little_mirror_blocked，随后从little_mirror_centers中删除
+
+```python
+def calc_shadow(heli_para, tower_para, solar_altitude_angle, solar_azimuth_angle):
+    pre_shadows = find_points_within_distance(df, heli_para[:3], 2, 20)  # 可能干扰的坐标的合集
+    print(pre_shadows)
+    shadow_count = 0
+    for pre_shadow in pre_shadows:
+        little_mirror = Station(pre_shadow, tower_para)
+        little_mirror_centers = mirror_split(little_mirror.heli_para)
+        little_mirror_blocked = []
+        print(little_mirror_centers)
+        for little_mirror_center in little_mirror_centers:
+            # 计算镜面中心到接受塔中心的单位向量
+
+            ........
+
+            s1e1 = np.dot(s1, e1)
+            t = np.dot(s2, e2) / s1e1
+            b1 = np.dot(s1, s) / s1e1
+            b2 = np.dot(s2, reflect_vector)
+
+            if t >= 0 and b1 >= 0:
+                continue
+```
+
+---
+
+已知长方体的所有顶点，一条射线的起点，方向向量，求射线与长方体是否有交点，可以使用什么算法？
+
+已知平面法向量 n 和入射光线反方向的单位向量 i，请写一段python代码，计算反射光线的单位向量 r。
