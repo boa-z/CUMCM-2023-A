@@ -23,6 +23,7 @@ avg_month_eta_sb = []
 avg_month_eta_trunc = []
 avg_month_eta_at = []
 avg_month_eta = []
+avg_month_e_field = []
 
 # 循环遍历每个月的21日
 current_date = start_date
@@ -32,6 +33,7 @@ while current_date <= end_date:
     avg_times_eta_trunc = []
     avg_times_eta_at = []
     avg_times_eta = []
+    avg_times_e_field = []
     # 打印当前日期的每个时间
     for time in times:
         hour, minute = map(int, time.split(':'))
@@ -41,6 +43,7 @@ while current_date <= end_date:
         heli_eta_trunc_output = []
         heli_eta_at_output = []
         heli_eta_output = []
+        heli_e_field_output = []
 
         for i, row in df.iterrows():
             heli_para = [row['x坐标 (m)'], row['y坐标 (m)'], 4, 6, 6, []]
@@ -54,16 +57,17 @@ while current_date <= end_date:
             heli_eta_trunc_output.append(eta_all[2])
             heli_eta_at_output.append(eta_all[3])
             heli_eta_output.append(eta_all[4])
+            heli_e_field_output.append(eta_all[5])
 
             # 对应
-            min_data = {"heli_eta_cos_output": heli_eta_cos_output,
-                    "heli_eta_sb_output": heli_eta_sb_output,
-                    "heli_eta_trunc_output": heli_eta_trunc_output,
-                    "heli_eta_at_output": heli_eta_at_output,
-                    "heli_eta_output": heli_eta_output}
-            min_df = pd.DataFrame(min_data)
-            csv_name = str(local_time) + '.csv'
-            min_df.to_csv(csv_name, mode='w', header=False)
+            # min_data = {"heli_eta_cos_output": heli_eta_cos_output,
+            #         "heli_eta_sb_output": heli_eta_sb_output,
+            #         "heli_eta_trunc_output": heli_eta_trunc_output,
+            #         "heli_eta_at_output": heli_eta_at_output,
+            #         "heli_eta_output": heli_eta_output}
+            # min_df = pd.DataFrame(min_data)
+            # csv_name = str(local_time) + '.csv'
+            # min_df.to_csv(csv_name, mode='w', header=False)
 
             # 计算平均值并添加到平均时间列表
             avg_time_eta_cos = sum(heli_eta_cos_output) / len(heli_eta_cos_output)
@@ -74,15 +78,21 @@ while current_date <= end_date:
             avg_times_eta_trunc.append(avg_time_eta_trunc)
             avg_time_eta_at = sum(heli_eta_at_output) / len(heli_eta_at_output)
             avg_times_eta_at.append(avg_time_eta_at)
+            avg_time_eta = sum(heli_eta_output) / len(heli_eta_output)
+            avg_times_eta.append(avg_time_eta)
+            avg_e_field = sum(heli_e_field_output) / len(heli_e_field_output)
+            avg_times_e_field.append(avg_e_field)
 
-            print(local_time, avg_time_eta_cos, avg_time_eta_sb, avg_time_eta_trunc, avg_time_eta_at)
+            print(local_time, avg_time_eta_cos, avg_time_eta_sb, avg_time_eta_trunc, avg_time_eta_at, avg_time_eta, avg_e_field)
 
             # 计算5个时间的平均值的平均值并添加到月平均列表
         avg_month_eta_cos.append(sum(avg_times_eta_cos) / len(avg_times_eta_cos))
         avg_month_eta_sb.append(sum(avg_times_eta_sb) / len(avg_times_eta_sb))
         avg_month_eta_trunc.append(sum(avg_times_eta_trunc) / len(avg_times_eta_trunc))
         avg_month_eta_at.append(sum(avg_times_eta_at) / len(avg_times_eta_at))
-        print(avg_month_eta_cos, avg_month_eta_sb, avg_month_eta_trunc, avg_month_eta_at)
+        avg_month_eta.append(sum(avg_times_eta) / len(avg_times_eta))
+        avg_month_e_field.append(sum(avg_times_e_field) / len(avg_times_e_field))
+        print(avg_month_eta_cos, avg_month_eta_sb, avg_month_eta_trunc, avg_month_eta_at, avg_month_eta, avg_month_e_field)
 
     # 增加一个月
     if current_date.month == 12:

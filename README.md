@@ -309,7 +309,9 @@ prompt: 现在要使用 AGSA 算法编写一个求解优化问题的函数，下
 
 根据这个要求，编写一个函数，用于初始种群。
 
-现在有一个函数，输入为圆的半径,内圆间隔，点的间隔，圆的个数，输出为点的坐标。
+现在有一个函数fondational_kabuilding(r,R,d,k)，输入为圆的半径,内圆间隔，点的间隔，圆的个数，输出为点的坐标。假设圆的半径,内圆间隔，点的间隔为固定值，圆的个数为可变值，请编写一个函数，输入为包含坐标列表，输出为适应度值。
+
+适应度值的计算方法如下：对于坐标列表中的每一个坐标(x, y, z)，使用p1.Station(x, y, z)创建一个定日镜，使用Station.eta_cos()计算余弦损失，使用Station.eta_sb()计算阴影损失，使用Station.eta_at()计算大气投射率，使用Station.eta_ref()计算镜面反射效率，使用Station.eta_trunc()计算集热器截断效率，使用Station.eta()计算光学效率，使用Station.E_field()计算输出热功率，使用Station.E_field_per_area()计算单位面积输出热功率，将所有定日镜的单位面积输出热功率相加，得到适应度值。
 
 然后现在怎么办？
 
@@ -333,3 +335,9 @@ $$
 其中，$E_{field}$ 为定日镜场的输出热功率，$n$ 为定日镜总数，$a$ 为定日镜的长度，$b$ 为定日镜的宽度。
 
 为了简化计算，先关注定日镜的坐标，计算余弦损失，剩余参数使用定值代替。
+
+---
+
+现在有一个函数 plot_coordinate(r,R,d,circle_amount,ro)，r,R,d,circle_amount,ro 分别为圆的半径,内圆间隔，点的间隔，圆的个数，输出为点的坐标。假设圆的半径,内圆间隔，点的间隔，圆的个数k为固定值，ro为可变值，通过fitness(plot_coordinate(r,R,d,circle_amount,ro)) 可以得到适应度值，请使用自适应引力搜索算法（Adaptive Gravitational Search Algorithm，AGSA），编写一个段程序，求解适应度值最大的ro。ro可能的范围在[1, 1.5]之间。
+
+请注意 fondational_kabuilding 和 fitness 函数不需要编写，直接调用即可。
