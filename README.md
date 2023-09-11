@@ -14,7 +14,7 @@
 
 定日镜是塔式太阳能光热发电站（以下简称塔式电站）收集太阳能的基本组件，其底座由 纵向转轴和水平转轴组成，平面反射镜安装在水平转轴上。纵向转轴的轴线与地面垂直，可以 控制反射镜的方位角。水平转轴的轴线与地面平行，可以控制反射镜的俯仰角，定日镜及底座示意图见图 1。两转轴的交点（也是定日镜中心）离地面的高度称为定日镜的安装高度。塔式 电站利用大量的定日镜组成阵列，称为定日镜场。定日镜将太阳光反射汇聚到安装在镜场中吸 收塔顶端上的集热器，加热其中的导热介质，并将太阳能以热能形式储存起来，再经过热交换 实现由热能向电能的转化。太阳光并非平行光线， 而是具有一定锥形角的一束锥形光线，因此 太阳入射光线经定日镜任意一点的反射光线也是一束锥形光线[2]。定日镜在工作时，控制系统 根据太阳的位置实时控制定日镜的法向，使得太阳中心点发出的光线经定日镜中心反射后指向 集热器中心。集热器中心的离地高度称为吸收塔高度。
 
-现计划在中心位于东经 98.5 ∘ ，北纬 39 .4∘ ，海拔 3000 m，半径 350 m 的圆形区域内建设 一个圆形定日镜场（图 2）。以圆形区域中心为原点，正东方向为 $x$ 轴正向，正北方向为 $y$ 轴 正向，垂直于地面向上方向为 $z$ 轴正向建立坐标系，称为镜场坐标系。
+现计划在中心位于东经 98.5 ∘ ，北纬 39.4∘ ，海拔 3000 m，半径 350 m 的圆形区域内建设 一个圆形定日镜场（图 2）。以圆形区域中心为原点，正东方向为 $x$ 轴正向，正北方向为 $y$ 轴 正向，垂直于地面向上方向为 $z$ 轴正向建立坐标系，称为镜场坐标系。
 
 规划的吸收塔高度为 80 m，集热器采用高 8 m、直径 7 m 的圆柱形外表受光式集热器。吸 收塔周围 100 m 范围内不安装定日镜，留出空地建造厂房，用于安装发电、储能、控制等设备。 定日镜的形状为平面矩形，其上下两条边始终平行于地面，这两条边之间的距离称为镜面高度， 镜面左右两条边之间的距离称为镜面宽度，通常镜面宽度不小于镜面高度。镜面边长在 2 m 至 8 m 之间，安装高度在 2 m 至 6 m 之间，安装高度必须保证镜面在绕水平转轴旋转时不会触及 地面。由于维护及清洗车辆行驶的需要，要求相邻定日镜底座中心之间的距离比镜面宽度多 5 m 以上。
 为简化计算，本问题中所有“年均”指标的计算时点均为当地时间每月 21 日 9:00、10:30、 12:00、13:30、15:00。
@@ -252,10 +252,6 @@ def calc_shadow(heli_para, tower_para, solar_altitude_angle, solar_azimuth_angle
 
 有一个直径为7m, 高度为8m 的圆柱体，请写一段代码，将其放在box_vertices中，求出这个box_vertices的所有顶点。
 
----
-
-写一段python 代码，判断变量 local_time 的值，若小于12点，`cos_as = math.sqrt(1 - sin_as ** 2)`取正，，若等于12点，cos_as = 0，若大于12点，cos_as = -math.sqrt(1 - sin_as ** 2)取负。
-
 ### 第二问
 
 请根据以下文本，编写一个python函数，输入定日镜场的半径，输出镜场的定日镜的位置坐标，将输出坐标等封装为dataframe并写入到p2_answer.csv, 再编写一个函数，将dataframe绘制为图像。
@@ -313,8 +309,6 @@ prompt: 现在要使用 AGSA 算法编写一个求解优化问题的函数，下
 
 适应度值的计算方法如下：对于坐标列表中的每一个坐标(x, y, z)，使用p1.Station(x, y, z)创建一个定日镜，使用Station.eta_cos()计算余弦损失，使用Station.eta_sb()计算阴影损失，使用Station.eta_at()计算大气投射率，使用Station.eta_ref()计算镜面反射效率，使用Station.eta_trunc()计算集热器截断效率，使用Station.eta()计算光学效率，使用Station.E_field()计算输出热功率，使用Station.E_field_per_area()计算单位面积输出热功率，将所有定日镜的单位面积输出热功率相加，得到适应度值。
 
-然后现在怎么办？
-
 ---
 
 约束条件
@@ -338,6 +332,60 @@ $$
 
 ---
 
-现在有一个函数 plot_coordinate(r,R,d,circle_amount,ro)，r,R,d,circle_amount,ro 分别为圆的半径,内圆间隔，点的间隔，圆的个数，输出为点的坐标。假设圆的半径,内圆间隔，点的间隔，圆的个数k为固定值，ro为可变值，通过fitness(plot_coordinate(r,R,d,circle_amount,ro)) 可以得到适应度值，请使用自适应引力搜索算法（Adaptive Gravitational Search Algorithm，AGSA），编写一个段程序，求解适应度值最大的ro。ro可能的范围在[1, 1.5]之间。
+现在有一个函数 plot_coordinate(r,R,d,circle_amount,ro)，r,R,d,circle_amount,ro 分别为圆的半径,内圆间隔，点的间隔，圆的个数，输出为点的坐标。假设圆的半径,内圆间隔，点的间隔为固定值，circle_amount、ro为可变值，通过fitness(plot_coordinate(r,R,d,circle_amount,ro)) 可以得到适应度值，请使用自适应引力搜索算法（Adaptive Gravitational Search Algorithm，AGSA），编写一个段程序，求解适应度值最大的circle_amount 和 ro。circle_amount 可能的范围在[1, 100]之间，ro可能的范围在[1, 1.5]之间。
 
 请注意 fondational_kabuilding 和 fitness 函数不需要编写，直接调用即可。
+
+现在有一个函数 plot_coordinate(r,w,h,z,circle_amount,ro)，假设r为固定值，w,h,z,circle_amount,ro为可变值，通过fitness(plot_coordinate(r,w,h,z,circle_amount,ro)) 可以得到适应度值，请使用自适应引力搜索算法（Adaptive Gravitational Search Algorithm，AGSA），编写一个段程序，求解适应度值最大的w,h,z,circle_amount,ro
+
+定义相关参数的取值范围和精度:
+ro_min = 1
+ro_max = 2
+ro_precision = 0.01
+w_min = 2
+w_max = 10
+w_precision = 0.1
+h_min = 2
+h_max = 8
+h_precision = 0.1
+z_min = 2
+z_max = 6
+z_precision = 0.1
+
+请注意 plot_coordinate 和 calc_fitness 函数不需要编写，直接调用即可。
+
+---
+
+修改代码，将best_points中所有满足条件的点，添加到 new_point_tmp 中，再计算fitness，将new_points_tmp中fitness值最大的点添加到new_points中。
+
+```python
+def plot_coordinate_real(best_points):
+    tower_para = (tower_x, 0, 84)
+    fitness_values_max = 0
+    for tower_x in range(-350, 350, 10):
+        tower_para = (tower_x, 0, 84)
+        new_points = []
+        for points in best_points:
+            new_points_tmp = []
+            x = points[0]
+            y = points[1]
+            z = points[2]
+            point = (x, y, z)
+            distance = (x-tower_para[0])**2 + (y-tower_para[1])**2
+            if distance < 350**2:
+                new_points_tmp.append(point)
+            fitness_values_new = calc_fitness(new_points_tmp)
+            print("fitness_values_new is:", fitness_values_new)
+        
+    return tower_para, new_points
+```
+
+### 第三问
+
+kmeans是什么
+
+请写一段python代码
+
+## 2023 A 赛后总结
+
+代码问题太多，编程能力需要加强

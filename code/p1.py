@@ -20,7 +20,7 @@ eta_ref = 0.9  # 镜面反射率
 
 split_num = 6  # 镜面拆分的份数
 
-tower_box_vertices = np.array([  # 顺序？？？？
+tower_box_vertices = np.array([
     [3.5, 3.5, 88],
     [-3.5, 3.5, 88],
     [3.5, -3.5, 88],
@@ -189,7 +189,7 @@ def mirror_point(heli_para) -> 'tuple[np.ndarray,np.ndarray,np.ndarray,np.ndarra
     return np.array([x1, y1, z1]), np.array([x2, y2, z2]), np.array([x3, y3, z3]), np.array([x4, y4, z4])
 
 
-# 镜面拆分，
+# 镜面拆分
 def mirror_split(heli_para) -> 'list[np.ndarray]':
     # split_num 镜面拆分的份数
     x_0, y_0, z_0, w, h = heli_para[:5]
@@ -242,8 +242,7 @@ def ray_box_intersection(ray_origin, ray_direction, box_vertices):
     return t_near <= t_far and t_far >= 0
 
 
-# 计算阴影
-# TODO: 目前计算遮挡有重复，需要移除重复的小块
+# 计算阴影。计算遮挡有重复，需要移除重复的小块
 def calc_shadow(heli_para, tower_para):
     pre_shadows = find_points_within_distance(df, heli_para[:3], 2, 20)  # 可能干扰的坐标的合集
     shadow_count = 0
@@ -289,13 +288,15 @@ def calc_shadow(heli_para, tower_para):
     if shadow_count == split_num*split_num:
         etc_sb = 1
     else:
-        etc_sb = shadow_count / (split_num*split_num)  # 阴影遮挡效率
+        etc_sb = shadow_count / (split_num*split_num) + shadow_tower()  # 阴影遮挡效率
 
     return etc_sb
 
 
 # 计算接收塔的阴影影响
-def shadow_tower(solar_altitude_angle):
+def shadow_tower():
+    sin_as, cos_as, cos_gamma_s, sin_gamma_s, sin_delta, dni = calc_solar(local_time, latitude, elevation)
+    solar_altitude_angle = math.asin(sin_as)
     tmp = (80 * math.tan(solar_altitude_angle) - 96.5)
     if tmp > 0:
         s = tmp

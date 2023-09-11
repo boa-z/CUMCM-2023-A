@@ -14,6 +14,7 @@ eta_ref = 0.92
 eta_at = 0.978
 dni = 1.05
 
+# 分块 -- 最后没时间实现，已经结束了
 
 # 将指定的条件下的镜场排列输出到列表中
 def plot_coordinate(r, w, h, z, circle_amount, ro):
